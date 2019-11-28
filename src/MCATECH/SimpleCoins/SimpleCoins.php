@@ -58,11 +58,13 @@ class SimpleCoins extends PluginBase{
     }
 	
 	public function addCoins($player, $coins){
-		if($coins < 0){
-			return self;
+		if($player instanceof Player) {
+			if($coins < 0){
+				return self;
+			}
+			$this->coins->setNested(strtolower($player->getName()).".coins", $this->coins->getAll()[strtolower($player->getName())]["coins"] + $coins);
+			$this->coins->save();
 		}
-        $this->coins->setNested(strtolower($player->getName()).".coins", $this->coins->getAll()[strtolower($player->getName())]["coins"] + $coins);
-        $this->coins->save();
     }
 	
 	public function remCoins($player, $coins){
@@ -83,9 +85,18 @@ class SimpleCoins extends PluginBase{
 		return true;
 	}
 	
-	public function getAllCoins() : array{
-		// TODO FOR /topcoins command. return $this->coins()->get("coins");
-		// incomplete part
+	public function getAllCoins() : string{
+		$coins = $this->coins->getAll();
+		$message = "§7Top Coins: ";
+        arsort($coins);
+        $pos = 1;
+        foreach ($coins as $name => $coins){
+            if ($pos === 6) break;
+			$topcoins = $this->coins->getAll()[strtolower($name)]["coins"];
+            $message .= "§f\n$pos. §b$name §7with:§b $topcoins §7coins.";
+            $pos++;
+        }
+		return $message;
 	}
 	
 	public function checkLogin(PlayerPreLoginEvent $event){
@@ -106,6 +117,14 @@ class SimpleCoins extends PluginBase{
             }
         }
 	}
+	
+	public function checkProfile($player){
+		if(!$this->coins->exists(strtolower($player->getName()))){
+			if ($player instanceof Player) {
+				$this->addPlayer($player);
+			}
+		}
+	}
 
 	public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
 		switch($command->getName()){
@@ -113,7 +132,7 @@ class SimpleCoins extends PluginBase{
 				if(!$this->coins->exists(strtolower($sender->getName()))){
 					if ($sender instanceof Player) {
 					$this->addPlayer($sender);
-					$sender->sendMessage($this->prefix . "Run this command again to access data.");
+					$sender->sendMessage($this->prefix . "You have been added to the coin system. Use /coins to see your balance.");
 				}
 				}else{
 				$sender->sendMessage($this->prefix . "§7You have:§e " . $this->getCoins($sender) . " §7coins.");
@@ -163,7 +182,7 @@ class SimpleCoins extends PluginBase{
 								$sender->sendMessage($this->prefix . "You cant set your coins to the same amount? silly!");
 							}else{
                             $sender->sendMessage($this->prefix . "§aYou set the coins successfully!");
-                            $this->setCoins($player, $coins);
+                            $this->setCoins($target, $coins);
 							}
                         }
                         break;
@@ -182,6 +201,9 @@ class SimpleCoins extends PluginBase{
                         break;
 				return true;
 				break;
+			case "topcoins":
+				$sender->sendMessage($this->getAllCoins());
+			break;
 			case "coininfo":
 				$messages = [
 					'§e--- §d' . $this->prefix .  'Information §e---',

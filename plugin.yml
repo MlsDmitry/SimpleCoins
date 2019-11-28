@@ -1,6 +1,6 @@
 name: SimpleCoins
 main: MCATECH\simplecoins\SimpleCoins
-version: 1.1.0
+version: 1.1.1
 api: 3.9.2
 load: POSTWORLD
 description: More details about this plugin are found in the ReadMe.md
@@ -21,6 +21,9 @@ commands:
  addcoins:
   default: op
   description: 'Add coins to a player'
+ topcoins:
+  default: true
+  description: 'See Players with the most coins'
  coininfo:
   default: true
   description: 'Coins info'
