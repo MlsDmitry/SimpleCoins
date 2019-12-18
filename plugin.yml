@@ -1,5 +1,5 @@
 name: SimpleCoins
-main: MCATECH\simplecoins\SimpleCoins
+main: MCATECH\SimpleCoins\SimpleCoins
 version: 1.14.0
 api: 3.9.2
 load: POSTWORLD
