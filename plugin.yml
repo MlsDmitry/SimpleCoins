@@ -1,6 +1,6 @@
 name: SimpleCoins
 main: MCATECH\simplecoins\SimpleCoins
-version: 1.1.1
+version: 1.14.0
 api: 3.9.2
 load: POSTWORLD
 description: More details about this plugin are found in the ReadMe.md
