@@ -21,6 +21,8 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 
+use MCATECH\SimpleCoins\commands\PayCommand;
+
 class SimpleCoins extends PluginBase{
 	
 	protected static $instance;
@@ -35,6 +37,7 @@ class SimpleCoins extends PluginBase{
 
 	public function onEnable() : void{
 		self::$instance = $this;
+		$this->regCommands();
 		$this->coins = new Config($this->getDataFolder() . "coins.yml", Config::YAML, array());
 			if(!is_dir($this->getDataFolder())) mkdir($this->getDataFolder());
 			$this->saveDefaultConfig();
@@ -48,6 +51,11 @@ class SimpleCoins extends PluginBase{
         $this->coins->setNested(strtolower($player->getName()).".rarecoins", "0");
         $this->coins->save();
     }
+	
+	public function regCommands() : void{
+		$server = $this->getServer();
+		$server->getCommandMap()->register("pay", new PayCommand($this));
+	}
 	
 	public function getCoins($player){
         return $this->coins->getAll()[strtolower($player->getName())]["coins"];
