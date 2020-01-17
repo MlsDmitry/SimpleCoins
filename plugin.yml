@@ -21,12 +21,6 @@ commands:
  addcoins:
   default: op
   description: 'Add coins to a player'
- topcoins:
-  default: true
-  description: 'See Players with the most coins'
  coininfo:
   default: true
   description: 'Coins info'
- pay:
-  default: true
-  description: 'Pay another player, aliases include: sendmoney, donate'

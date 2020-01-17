@@ -22,6 +22,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 
 use MCATECH\SimpleCoins\commands\PayCommand;
+use MCATECH\SimpleCoins\commands\TopCommand;
 
 class SimpleCoins extends PluginBase{
 	
@@ -55,6 +56,7 @@ class SimpleCoins extends PluginBase{
 	public function regCommands() : void{
 		$server = $this->getServer();
 		$server->getCommandMap()->register("pay", new PayCommand($this));
+		$server->getCommandMap()->register("topcoins", new TopCommand($this));
 	}
 	
 	public function getCoins($player){
@@ -209,9 +211,6 @@ class SimpleCoins extends PluginBase{
                         break;
 				return true;
 				break;
-			case "topcoins":
-				$sender->sendMessage($this->getAllCoins());
-			break;
 			case "coininfo":
 				$messages = [
 					'§e--- §d' . $this->prefix .  'Information §e---',
