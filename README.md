@@ -14,6 +14,7 @@ Within your plugin call the static function with 'SimpleCoins::getInstance()' an
 | Default command | Parameter | Description | Default Permission |
 | :-----: | :-------: | :---------: | :-------: |
 | /coins | | Shows your money | All |
+| /pay | `<player>` | Send another player coins | All |
 | /topcoins WIP | | Shows top money | All |
 | /addcoins | `<coins>` | Adds `<money>` To a player | `OP` |
 | /remcoins | `<coins>` | Removes `<money>` From a player | `OP` |
