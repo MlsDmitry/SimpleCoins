@@ -1,4 +1,3 @@
-# Simple Coins Confif File
-coins on death: true
+# Simple Coins Config File
+#prefix for messages sent ingame
 prefix: "§eSimpleCoins -"
-

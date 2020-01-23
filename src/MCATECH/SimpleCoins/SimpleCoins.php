@@ -22,6 +22,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 
 use MCATECH\SimpleCoins\commands\PayCommand;
+use MCATECH\SimpleCoins\commands\AddCoinsCommand;
 use MCATECH\SimpleCoins\commands\TopCommand;
 
 class SimpleCoins extends PluginBase{
@@ -56,6 +57,7 @@ class SimpleCoins extends PluginBase{
 	public function regCommands() : void{
 		$server = $this->getServer();
 		$server->getCommandMap()->register("pay", new PayCommand($this));
+		$server->getCommandMap()->register("addcoins", new AddCoinsCommand($this));
 		$server->getCommandMap()->register("topcoins", new TopCommand($this));
 	}
 	
@@ -116,18 +118,6 @@ class SimpleCoins extends PluginBase{
 		}
 	}
 	
-	public function onPlayerDeath(PlayerDeathEvent $event){
-		$player = $event->getPlayer();
-        if($event->getEntity()->getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-            $killer = $event->getEntity()->getLastDamageCause()->getDamager();
-            if($killer instanceof Player) {
-				$this->addCoins($killer, 50);
-				$killer->sendMessage($this->prefix . " You got 50 coins for a well worked kill!");
-				//CONFIG TRUE FALSE TO BE IMPLAMENTED FOR FULL EDITABILITY //
-            }
-        }
-	}
-	
 	public function checkProfile($player){
 		if(!$this->coins->exists(strtolower($player->getName()))){
 			if ($player instanceof Player) {
@@ -146,26 +136,30 @@ class SimpleCoins extends PluginBase{
 				}
 				}else{
 				$sender->sendMessage($this->prefix . "§7You have:§e " . $this->getCoins($sender) . " §7coins.");
+				$others = array_shift($args);
+					if($others == 'info'){
+						$messages = [
+						'§e--- §d' . $this->prefix .  'Information §e---',
+						'§6Authors: §d{author}',
+						'§6Supported API versions: §d{apis}',
+						'§6Plugin Version: §d{full_name}',
+						'§e--- §d' . $this->prefix .  'Information §e---'
+						];
+						$values = [
+							'{full_name}' => $this->getDescription()->getFullName(),
+							'{author}' => implode(', ', $this->getDescription()->getAuthors()),
+							'{apis}' => implode(', ', $this->getDescription()->getCompatibleApis()),
+						];
+						$sender->sendMessage(str_replace(array_keys($values), array_values($values), implode(T::RESET."\n", $messages)));
+					}else{
+						return true;
+					}
 				}
 				return true;
 				break;
 			case "rarecoins":
 				$sender->sendMessage($this->prefix . "§7You have:§e " . $this->getRareCoins($sender) . " §7Rare coins.");
 				return true;
-			case "addcoins":
-				$target = array_shift($args);
-				$coins = array_shift($args);
-                    if (is_null($target) or is_null($coins)) {
-                        $sender->sendMessage($this->prefix . "§eUsage: §7/addcoins {player} {amount}");
-                        break;
-                        }
-						if (($player = $this->getServer()->getPlayer($target)) instanceof Player) {
-                            $sender->sendMessage($this->prefix . "§aYou added the coins successfully!");
-                            $this->addCoins($player, $coins);
-                        }
-                        break;
-				return true;
-				break;
 			case "remcoins":
 				$target = array_shift($args);
 				$coins = array_shift($args);
@@ -210,21 +204,6 @@ class SimpleCoins extends PluginBase{
                         }
                         break;
 				return true;
-				break;
-			case "coininfo":
-				$messages = [
-					'§e--- §d' . $this->prefix .  'Information §e---',
-					'§6Authors: §d{author}',
-					'§6Supported API versions: §d{apis}',
-					'§6Plugin Version: §d{full_name}',
-					'§e--- §d' . $this->prefix .  'Information §e---'
-				];
-				$values = [
-					'{full_name}' => $this->getDescription()->getFullName(),
-					'{author}' => implode(', ', $this->getDescription()->getAuthors()),
-					'{apis}' => implode(', ', $this->getDescription()->getCompatibleApis()),
-				];
-				$sender->sendMessage(str_replace(array_keys($values), array_values($values), implode(T::RESET."\n", $messages)));
 				break;
 			default:
 				return false;
