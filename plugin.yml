@@ -1,14 +1,11 @@
 name: SimpleCoins
 main: MCATECH\SimpleCoins\SimpleCoins
-version: 1.14.2
-api: 3.11
+version: 1.14.3
+api: [3.0.0, 3.11.0]
 load: POSTWORLD
-description: More details about this plugin are found in the ReadMe.md
+description: A simpler Economy Plugin. More details about this plugin are found in the ReadMe.md
 author: MCATECH
 commands:
- coins:
-  default: true
-  description: 'Check a coin balance'
  rarecoins:
   default: true
   description: 'Check for rarecoins'
@@ -18,3 +15,6 @@ commands:
  remcoins:
   default: op
   description: 'Remove coins from a player'
+permissions:
+ coin.command:
+  default: true

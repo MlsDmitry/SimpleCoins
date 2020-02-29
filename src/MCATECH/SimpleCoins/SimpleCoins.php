@@ -24,6 +24,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use MCATECH\SimpleCoins\commands\PayCommand;
 use MCATECH\SimpleCoins\commands\AddCoinsCommand;
 use MCATECH\SimpleCoins\commands\TopCommand;
+use MCATECH\SimpleCoins\commands\CoinCommand;
 
 class SimpleCoins extends PluginBase{
 	
@@ -31,11 +32,20 @@ class SimpleCoins extends PluginBase{
 	
 	public $SimpleCoins;
 	
-	public $prefix = "§eSimpleCoins - ";
+	public $prefix = [];
 	
 	public static function getInstance() : SimpleCoins{
 		return self::$instance;
 	}
+	
+	public function onLoad() {
+        if(!is_dir($this->getDataFolder())) {
+            mkdir($this->getDataFolder());
+        }
+        $this->saveResource("coins.yml");
+        $this->saveResource("config.yml");
+        $this->config = new Config($this->getDataFolder() . "config.yml");
+    }
 
 	public function onEnable() : void{
 		self::$instance = $this;
@@ -43,13 +53,14 @@ class SimpleCoins extends PluginBase{
 		$this->coins = new Config($this->getDataFolder() . "coins.yml", Config::YAML, array());
 			if(!is_dir($this->getDataFolder())) mkdir($this->getDataFolder());
 			$this->saveDefaultConfig();
+		$this->prefix = $this->config->get("prefix");
 	}
 	/**
 	** !! Important Api for plugin !! Do not edit unless you know what your doing !!
 	**/
 	
 	public function addPlayer($player){
-        $this->coins->setNested(strtolower($player->getName()).".coins", "0");
+        $this->coins->setNested(strtolower($player->getName()).".coins", $this->config->get("default-coins"));
         $this->coins->setNested(strtolower($player->getName()).".rarecoins", "0");
         $this->coins->save();
     }
@@ -59,10 +70,11 @@ class SimpleCoins extends PluginBase{
 		$server->getCommandMap()->register("pay", new PayCommand($this));
 		$server->getCommandMap()->register("addcoins", new AddCoinsCommand($this));
 		$server->getCommandMap()->register("topcoins", new TopCommand($this));
+		$server->getCommandMap()->register("coins", new CoinCommand($this));
 	}
 	
 	public function getCoins($player){
-        return $this->coins->getAll()[strtolower($player->getName())]["coins"];
+		return $this->coins->getAll()[strtolower($player->getName())]["coins"];
     }
 	
 	public function getRareCoins($player){
@@ -128,35 +140,6 @@ class SimpleCoins extends PluginBase{
 
 	public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
 		switch($command->getName()){
-			case "coins":
-				if(!$this->coins->exists(strtolower($sender->getName()))){
-					if ($sender instanceof Player) {
-					$this->addPlayer($sender);
-					$sender->sendMessage($this->prefix . "You have been added to the coin system. Use /coins to see your balance.");
-				}
-				}else{
-				$sender->sendMessage($this->prefix . "§7You have:§e " . $this->getCoins($sender) . " §7coins.");
-				$others = array_shift($args);
-					if($others == 'info'){
-						$messages = [
-						'§e--- §d' . $this->prefix .  'Information §e---',
-						'§6Authors: §d{author}',
-						'§6Supported API versions: §d{apis}',
-						'§6Plugin Version: §d{full_name}',
-						'§e--- §d' . $this->prefix .  'Information §e---'
-						];
-						$values = [
-							'{full_name}' => $this->getDescription()->getFullName(),
-							'{author}' => implode(', ', $this->getDescription()->getAuthors()),
-							'{apis}' => implode(', ', $this->getDescription()->getCompatibleApis()),
-						];
-						$sender->sendMessage(str_replace(array_keys($values), array_values($values), implode(T::RESET."\n", $messages)));
-					}else{
-						return true;
-					}
-				}
-				return true;
-				break;
 			case "rarecoins":
 				$sender->sendMessage($this->prefix . "§7You have:§e " . $this->getRareCoins($sender) . " §7Rare coins.");
 				return true;
